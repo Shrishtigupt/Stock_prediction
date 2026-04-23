@@ -12,7 +12,12 @@ st.title("📈 Stock Price Prediction App")
 
 st.sidebar.header("User Input")
 
-stock_symbol = st.sidebar.text_input("Enter Stock Name", "AAPL")
+Stock_df = pd.read_csv("Stock.csv")
+
+stock_symbol = st.sidebar.selectbox(
+    "Select Stock",
+    Stock_df["Symbol"]
+)
 
 if st.sidebar.button("Predict"):
 
