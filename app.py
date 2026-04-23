@@ -12,13 +12,27 @@ st.title("📈 Stock Price Prediction App")
 
 st.sidebar.header("User Input")
 
-stock_symbol = st.sidebar.text_input("Enter Stock Symbol", "AAPL")
+stock_symbol = st.sidebar.text_input("Enter Stock Name", "AAPL")
 
 if st.sidebar.button("Predict"):
 
     st.subheader(f"Stock Data for {stock_symbol}")
 
     data = load_stock_data(stock_symbol)
+
+    # ---- FIX ADDED HERE ----
+    if data is None or data.empty:
+        st.error("No stock data found. Please enter a valid stock symbol.")
+        st.stop()
+
+    # Remove missing values
+    data = data.dropna()
+
+    # Check minimum rows
+    if len(data) < 10:
+        st.error("Not enough stock data available for prediction.")
+        st.stop()
+    # ------------------------
 
     st.write(data.tail())
 
