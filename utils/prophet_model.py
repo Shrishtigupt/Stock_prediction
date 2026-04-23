@@ -1,13 +1,11 @@
 from prophet import Prophet
 import pandas as pd
 
-def prophet_forecast(train, test):
+def prophet_forecast(train, future_days=30):
 
     prophet_train = train[['Date', 'Close']].copy()
 
     prophet_train.columns = ['ds', 'y']
-
-    prophet_train['ds'] = pd.to_datetime(prophet_train['ds'])
 
     model = Prophet(
         daily_seasonality=True,
@@ -16,10 +14,8 @@ def prophet_forecast(train, test):
 
     model.fit(prophet_train)
 
-    future = model.make_future_dataframe(periods=len(test))
+    future = model.make_future_dataframe(periods=future_days)
 
     forecast = model.predict(future)
 
-    predicted = forecast['yhat'].tail(len(test)).values
-
-    return predicted, model
+    return forecast, model

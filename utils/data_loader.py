@@ -8,7 +8,11 @@ def load_stock_data(symbol):
     if stock.empty:
         return pd.DataFrame()
 
-    data = stock[['Adj Close']].reset_index()
+    # Use Adj Close if available, otherwise Close
+    if 'Adj Close' in stock.columns:
+        data = stock[['Adj Close']].reset_index()
+    else:
+        data = stock[['Close']].reset_index()
 
     data.dropna(inplace=True)
 

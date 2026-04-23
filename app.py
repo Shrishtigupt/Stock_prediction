@@ -3,7 +3,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 from utils.data_loader import load_stock_data
-from utils.preprocess import split_data
 from utils.prophet_model import prophet_forecast
 
 st.set_page_config(page_title="Stock Prediction App", layout="wide")
@@ -25,44 +24,37 @@ if st.sidebar.button("Predict"):
 
     data = load_stock_data(stock_symbol)
 
-    # ---- FIX ADDED HERE ----
+    # Check empty data
     if data is None or data.empty:
-        st.error("No stock data found. Please enter a valid stock symbol.")
+        st.error("No stock data found.")
         st.stop()
 
     # Remove missing values
     data = data.dropna()
 
-    # Check minimum rows
+    # Minimum rows check
     if len(data) < 10:
         st.error("Not enough stock data available for prediction.")
         st.stop()
-    # ------------------------
 
     st.write(data.tail())
 
-    train, test, train_size = split_data(data)
+    # Prophet Forecast
+    forecast, prophet_model = prophet_forecast(data, 30)
 
-    prophet_pred, prophet_model = prophet_forecast(train, test)
+    st.subheader("Future 30-Day Prediction")
 
-    st.subheader("Forecast Results")
+    future_forecast = forecast[['ds', 'yhat']].tail(30)
 
-    prophet_dates = test['Date'].values
+    st.write(future_forecast)
 
-    forecast_df = pd.DataFrame({
-        'Date': prophet_dates,
-        'Actual Price': test['Close'].values,
-        'Predicted Price': prophet_pred
-    })
-
-    st.write(forecast_df.tail())
-
+    # Plot
     fig, ax = plt.subplots(figsize=(12,6))
 
-    ax.plot(test['Date'], test['Close'], label='Actual Price')
-    ax.plot(test['Date'], prophet_pred, label='Predicted Price')
+    ax.plot(data['Date'], data['Close'], label='Historical Price')
+    ax.plot(forecast['ds'], forecast['yhat'], label='Forecast')
 
-    ax.set_title(f"{stock_symbol} Stock Prediction")
+    ax.set_title(f"{stock_symbol} Future Stock Prediction")
     ax.legend()
 
     st.pyplot(fig)
