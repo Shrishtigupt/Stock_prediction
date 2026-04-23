@@ -1,17 +1,25 @@
 from prophet import Prophet
+import pandas as pd
 
 def prophet_forecast(train, test):
 
-    prophet_train = train.rename(columns={"Date": "ds", "Close": "y"})
+    prophet_train = train[['Date', 'Close']].copy()
 
-    model_prophet = Prophet()
+    prophet_train.columns = ['ds', 'y']
 
-    model_prophet.fit(prophet_train)
+    prophet_train['ds'] = pd.to_datetime(prophet_train['ds'])
 
-    future = model_prophet.make_future_dataframe(periods=len(test))
+    model = Prophet(
+        daily_seasonality=True,
+        yearly_seasonality=True
+    )
 
-    forecast = model_prophet.predict(future)
+    model.fit(prophet_train)
 
-    prophet_pred = forecast['yhat'][-len(test):].values
+    future = model.make_future_dataframe(periods=len(test))
 
-    return prophet_pred, model_prophet
+    forecast = model.predict(future)
+
+    predicted = forecast['yhat'].tail(len(test)).values
+
+    return predicted, model
