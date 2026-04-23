@@ -40,11 +40,11 @@ if st.sidebar.button("Predict"):
     st.write(data.tail())
 
     # Prophet Forecast
-    forecast, prophet_model = prophet_forecast(data, 30)
+    forecast, prophet_model = prophet_forecast(data, 1095)
 
-    st.subheader("Future 30-Day Prediction")
+    st.subheader("Future Stock Prediction Until 2027")
 
-    future_forecast = forecast[['ds', 'yhat']].tail(30)
+    future_forecast = forecast[['ds', 'yhat']].tail(1095)
 
     st.write(future_forecast)
 

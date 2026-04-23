@@ -3,7 +3,7 @@ import pandas as pd
 
 def load_stock_data(symbol):
 
-    stock = yf.download(symbol, start="2018-01-01", end="2024-01-01")
+    stock = yf.download(symbol, start="2018-01-01", end="2027-12-31")
 
     if stock.empty:
         return pd.DataFrame()
